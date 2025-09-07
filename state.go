@@ -31,6 +31,9 @@ func (s *Store) NewState(searchPath []string) *State {
 	var cSearchPath **C.char
 	if len(searchPath) > 0 {
 		cSearchPath = (**C.char)(unsafe.Pointer(&searchPathPtrs[0]))
+	} else {
+		var cNull *C.char
+		cSearchPath = &cNull
 	}
 
 	cstate := C.nix_state_create(s.context().ccontext, cSearchPath, s.cstore)

@@ -38,6 +38,12 @@
             # this is not actually required for the build, but
             # for tests that require `import <nixpkgs>`
             NIX_PATH = "nixpkgs=${nixpkgs}";
+
+            # gonix tests require instantiating a store, which cannot be done inside a nix build
+            # (that would be recursive nix) so when building inside nix, we disable the tests
+            #
+            # you can still run tests with nix develop -c go test ./... -v
+            doCheck = false;
           };
         });
     };

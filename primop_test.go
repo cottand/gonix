@@ -2,17 +2,21 @@ package gonix_test
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 
 	"github.com/farcaller/gonix"
 )
 
-func TestExampleRegisterGlobalPrimOp(t *testing.T) {
+func ExampleRegisterGlobalPrimOp() {
 	ctx := gonix.NewContext()
-	store, _ := gonix.NewStore(ctx, "dummy", nil)
+	store, err := gonix.NewStore(ctx, "dummy", nil)
+	if err != nil {
+		panic(fmt.Errorf("failed to create a store: %v", err))
+	}
 
-	err := gonix.RegisterGlobalPrimOp(
+	err = gonix.RegisterGlobalPrimOp(
 		ctx,
 		"summer",
 		[]string{"arg0", "arg1", "arg2"},
@@ -26,10 +30,10 @@ func TestExampleRegisterGlobalPrimOp(t *testing.T) {
 			return ret.SetInt(sum)
 		})
 	if err != nil {
-		t.Fatalf("failed to register: %v", err)
+		panic(fmt.Errorf("failed to register: %v", err))
 	}
 
-	state := store.NewState(nil)
+	state := store.NewState([]string{os.Getenv("NIX_PATH")})
 
 	res, err := state.EvalExpr(`builtins.summer 1 2 3`, ".")
 	if err != nil {
@@ -38,14 +42,14 @@ func TestExampleRegisterGlobalPrimOp(t *testing.T) {
 
 	i, err := res.GetInt()
 	if err != nil {
-		t.Fatalf("failed to convert the value to int: %v", err)
+		panic(fmt.Errorf("failed to convert the value to int: %v", err))
 	}
 	if i != 6 {
-		t.Fatalf("expected 6, got %d", i)
+		panic(fmt.Errorf("expected 6, got %d", i))
 	}
 }
 
-func TestExampleRegisterGlobalPrimOpWithError(t *testing.T) {
+func TestRegisterGlobalPrimOpWithError(t *testing.T) {
 	ctx := gonix.NewContext()
 	store, _ := gonix.NewStore(ctx, "dummy", nil)
 
